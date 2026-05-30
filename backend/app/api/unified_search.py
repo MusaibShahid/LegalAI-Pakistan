@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select, or_, and_, cast, String
@@ -404,6 +405,10 @@ async def _search_laws(
     filters = []
     keyword = _escape_like(classified.normalized_query)
 
+    # Extract section number patterns from any query type (e.g., "489-F" from "Cheque dishonour 489-F")
+    section_patterns = re.findall(r'\b(\d{1,3}-?[A-Z]?)\b', q, re.IGNORECASE)
+    section_patterns = [p for p in section_patterns if len(p) >= 2]  # Filter short numbers
+
     if classified.search_type == "section" and section_num:
         # For section searches, use section number + law name
         if law_full_name:
@@ -415,15 +420,47 @@ async def _search_laws(
             )
         else:
             filters.append(LawSection.section_number.ilike(f"%{section_num}%"))
-    else:
-        # General keyword search
-        filters.append(
-            or_(
-                LawSection.law_name.ilike(f"%{keyword}%"),
-                LawSection.section_number.ilike(f"%{keyword}%"),
-                LawSection.section_text.ilike(f"%{keyword}%"),
+    elif section_patterns:
+        # If we found section-like patterns, search for them in section_number
+        section_filters = [LawSection.section_number.ilike(f"%{p}%") for p in section_patterns]
+        # Also search for keywords in section text
+        word_filters = []
+        for word in q.split():
+            if len(word) >= 3 and not re.match(r'^\d', word):
+                word_filters.append(LawSection.section_text.ilike(f"%{_escape_like(word)}%"))
+
+        if word_filters:
+            # Match sections that have the section number AND any keyword
+            filters.append(
+                and_(
+                    or_(*section_filters),
+                    or_(*word_filters),
+                )
             )
-        )
+        else:
+            filters.append(or_(*section_filters))
+    else:
+        # General keyword search - search individual words
+        word_conditions = []
+        for word in q.split():
+            if len(word) >= 3:
+                escaped = _escape_like(word)
+                word_conditions.append(
+                    or_(
+                        LawSection.law_name.ilike(f"%{escaped}%"),
+                        LawSection.section_number.ilike(f"%{escaped}%"),
+                        LawSection.section_text.ilike(f"%{escaped}%"),
+                    )
+                )
+        if word_conditions:
+            filters.append(and_(*word_conditions))
+        else:
+            filters.append(
+                or_(
+                    LawSection.law_name.ilike(f"%{keyword}%"),
+                    LawSection.section_text.ilike(f"%{keyword}%"),
+                )
+            )
 
     if law:
         filters.append(
