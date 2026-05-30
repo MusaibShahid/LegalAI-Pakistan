@@ -1,0 +1,17 @@
+# robots.txt for LegalSearch Pakistan
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+
+Sitemap: https://legalsearch.pk/sitemap.xml
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Disallow: /_next/
+
+User-agent: Adsbot-Google
+Allow: /

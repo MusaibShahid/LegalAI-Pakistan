@@ -6,6 +6,7 @@ import Link from "next/link";
 import { unifiedSearch, getUnifiedSuggestions } from "@/lib/api";
 import type { UnifiedSearchResult, UnifiedSearchResponse, UnifiedSuggestion } from "@/types";
 import type { UnifiedSearchFilters } from "@/lib/api";
+import { SidebarAd } from "@/components/GoogleAd";
 
 const SECTION_ICONS: Record<string, { icon: string; color: string; label: string }> = {
   judgment: { icon: "⚖️", color: "border-l-pk-gold-500 bg-pk-gold-50/30 dark:bg-pk-gold-900/10", label: "Judgments" },
@@ -770,6 +771,11 @@ function SearchContent() {
               <p className="text-xs text-zinc-400 dark:text-pk-green-500">
                 <span className="font-medium text-zinc-500 dark:text-pk-green-400">Pro tip:</span> Type any citation, section number, or keyword — results appear instantly. Use the dedicated search engines for deeper filtering.
               </p>
+
+              {/* Non-intrusive ad in empty state */}
+              <div className="mt-6">
+                <SidebarAd className="max-w-sm mx-auto" />
+              </div>
               <div className="mt-3 flex flex-wrap justify-center gap-2">
                 {[
                   { href: "/search/caselaw", label: "Caselaw" },

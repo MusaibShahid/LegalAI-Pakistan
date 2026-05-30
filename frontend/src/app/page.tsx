@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import SearchBar from "@/components/SearchBar";
 import Link from "next/link";
 import { getLatestJudgments, type LatestJudgment } from "@/lib/api";
+import { BannerAd } from "@/components/GoogleAd";
 
 const quickLinks = [
   // Supreme Court citations
@@ -363,6 +364,11 @@ export default function Home() {
             </div>
           )}
         </div>
+      </section>
+
+      {/* Ad Banner - Non-intrusive between sections */}
+      <section className="border-t border-zinc-100 bg-zinc-50 px-4 py-4 dark:border-pk-green-800 dark:bg-pk-green-900/20">
+        <BannerAd className="opacity-90" />
       </section>
 
       {/* Features Section */}
