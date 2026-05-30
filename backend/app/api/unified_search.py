@@ -105,6 +105,17 @@ async def unified_search(
         # Combine results with sort: judgments first, then laws, then magazines
         all_results = judgment_results + law_results + magazine_results
 
+        # Deduplicate results by title + subtitle (citation)
+        seen = set()
+        deduped = []
+        for r in all_results:
+            # Create a dedup key from title and subtitle/citation
+            key = f"{r.title.lower().strip()}:{(r.subtitle or '').lower().strip()}"
+            if key not in seen:
+                seen.add(key)
+                deduped.append(r)
+        all_results = deduped
+
         # Apply pagination
         total = len(all_results)
         start = (page - 1) * page_size
