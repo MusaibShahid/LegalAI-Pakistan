@@ -1,0 +1,14 @@
+{
+  "name": "legalsearch-pakistan",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Professional legal search platform for Pakistani laws, judgments, and citations",
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm start",
+    "lint": "cd frontend && npm run lint"
+  },
+  "keywords": ["legal", "pakistan", "search", "law", "judgments"],
+  "license": "MIT"
+}
