@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: plse-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: plse
+      POSTGRES_PASSWORD: plse_secret
+      POSTGRES_DB: plse
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  cache:
+    image: redis:7-alpine
+    container_name: plse-cache
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:
